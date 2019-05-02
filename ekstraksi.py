@@ -51,7 +51,7 @@ features, labels = generate_features_and_labels()
 #%% normalize all feature value
 features = softmax(features)
 #%% Shuffle dan split data, taking a train and test data
-training_split=0.5
+training_split=0.8
 alldata = np.column_stack((features,labels))
 np.random.shuffle(alldata)
 splitidx = int(len(alldata)*training_split)
