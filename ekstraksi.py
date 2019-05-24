@@ -1,15 +1,17 @@
 #%%
+import time
 import librosa
 import librosa.feature
 import librosa.display
 import glob
 import numpy as np
-import matplotlib.pyplot as plt
-from sklearn.metrics import classification_report, confusion_matrix  
+import sklearn.metrics
+from sklearn.metrics import  confusion_matrix  
 from sklearn.naive_bayes import GaussianNB
 
+start = time.time()
 #%% Method for show visual of audio data
-''''def display_mfcc(audio):
+"""def display_mfcc(audio):
     y, _ = librosa.load(audio)
     mfcc = librosa.feature.mfcc(y)
     
@@ -18,16 +20,17 @@ from sklearn.naive_bayes import GaussianNB
     plt.colorbar()
     plt.title(audio)
     plt.tight_layout()
-    plt.show()'''
+    plt.show()
 #%% Using method display_mfcc
-'''display_mfcc('a2002011001-e02-8kHz.wav')'''
+display_mfcc('abel1.wav')"""
 #%% Method for Extract Feature of audio
 def extract_feature_audio(f):
     y, _ = librosa.load(f)
+
     mfcc = librosa.feature.mfcc(y)
     mfcc /= np.amax(np.absolute(mfcc))
     
-    return np.ndarray.flatten(mfcc)[:320]
+    return np.ndarray.flatten(mfcc)[:300]
 #%% Collect data and take feature and label by folder's name
 def generate_features_and_labels():
     all_features = []
@@ -50,18 +53,20 @@ def softmax(x):
 features, labels = generate_features_and_labels()
 #%% normalize all feature value
 features = softmax(features)
-#%% Shuffle dan split data, taking a train and test data
-training_split=0.8
+#%% Shuffle data 
 alldata = np.column_stack((features,labels))
+np.random.seed(200)
 np.random.shuffle(alldata)
+#%% split data, taking a train and test data
+training_split=0.9
 splitidx = int(len(alldata)*training_split)
 train, test = alldata[:splitidx,:], alldata[splitidx:,:]
 #training data
-train_input = train[:,:-1]
+train_input = train[:,:-256]
 train_input = train_input.astype(np.float)
 train_labels = train[:,-1:]
 #testing data
-test_input = test[:,:-1]
+test_input = test[:,:-256]
 test_input = test_input.astype(np.float)
 test_labels = test[:,-1:]
 #%% Method for classification all data from array test_input and take Accuracy or Evaluating
@@ -72,19 +77,14 @@ def predict_all():
     
     print("Result Prediction :",pred)
     print("Real label data :",test_labels)
-    print('\n\nEvaluate Naive Bayes')
+    print('\nEvaluate Naive Bayes')
     print(confusion_matrix(test_labels, pred))  
-    print(classification_report(test_labels,pred))
+    print("\nAkurasi : ",sklearn.metrics.accuracy_score(test_labels,pred))
 #%% Classification 20% total data
 predict_all()
 
-
-
-
-
-
-
-
+end = time.time()
+#print(end-start)
 
 
 
